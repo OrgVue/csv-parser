@@ -15,7 +15,7 @@ const extend = transform => stream => Stream(stream, transform, Stream.next)
 const extract = stream => stream[1](stream[0])
 
 // next :: Stream a -> Stream a
-const next = stream => Stream(stream[2](stream[0], stream[1], stream[2]))
+const next = stream => Stream(stream[2](stream[0]), stream[1], stream[2])
 
 // Exports.
 Stream.EOS = EOS
