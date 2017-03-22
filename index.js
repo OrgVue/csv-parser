@@ -1,11 +1,11 @@
 "use strict"
 
 // Imports.
-const csvparser = require("./src/csv-parser.js")
-const extenders = require("./src/transforms.js")
+const parser = require("./src/parser.js")
+const extenders = require("./src/extenders.js")
 
 // Exports.
 module.exports = {
-  createObjects: extenders.createObjects,
-  parseString: csvparser.parseString
+  createObject: extenders.createObject,
+  parseString: parser.parseString
 }

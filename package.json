@@ -1,0 +1,25 @@
+{
+  "author": "Concentra Analytics",
+  "bugs": {
+    "url": "https://github.com/OrgVue/csv-parser/issues"
+  },
+  "description": "",
+  "homepage": "https://github.com/OrgVue/csv-parser#readme",
+  "keywords": [
+    "csv",
+    "parser",
+    "functional",
+    "streaming"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "csv-parser",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OrgVue/csv-parser.git"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "version": "0.1.0"
+}
