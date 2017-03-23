@@ -27,11 +27,25 @@ const fromArray = xs => Stream(
 // next :: Stream a -> Stream a
 const next = stream => Stream(stream[2](stream[0]), stream[1], stream[2])
 
+// toArray :: Stream a -> [a]
+const toArray = stream => {
+  var x, xs
+
+  xs = []
+  while ((x = Stream.extract(stream)) !== Stream.EOS) {
+    xs.push(x)
+    stream = Stream.next(stream)
+  }
+
+  return xs
+}
+
 // Exports.
 module.exports = mixin({
   EOS: EOS,
   extend: extend,
   extract: extract,
   fromArray: fromArray,
-  next: next
+  next: next,
+  toArray: toArray
 })(Stream)

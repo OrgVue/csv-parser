@@ -39,7 +39,7 @@ stream = parser.parseString("one, two\nHello world,3.14")
 header = Stream.extract(stream)
 if (header === Stream.EOS) throw new Error("CSV is empty")
 stream = Stream.next(stream)
-stream = parser.createObject(header, stream)
+stream = parser.createObject(header.map(key => key.trim()), stream)
 
 while ((obj = Stream.extract(stream)) !== Stream.EOS) {
   console.log(obj)
@@ -52,3 +52,4 @@ while ((obj = Stream.extract(stream)) !== Stream.EOS) {
 
 ## Todo
 - Support file streams
+- Check excel behaviour, allow setting value delimiter to tab to allow reading pastes

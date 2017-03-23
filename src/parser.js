@@ -29,22 +29,28 @@ const getState = (i, s) => {
   row = []
   while (i < s.length) {
     c = s.charAt(i++)
-    if (quoting) {
-      if (c === valueDelim || c === recordDelim) {
-        quoting = false
-        buf = (QUOTE + buf).trim()
+
+    if (!quoting) {
+      if (c === valueDelim || c === recordDelim) { // end of value
         row.push(buf)
-        valid = valid || buf.length > 0
+        valid = valid || buf.trim().length > 0
         buf = ""
 
-        if (c === recordDelim) {
+        if (c === recordDelim) { // end of record
           if (valid) {
             break
           } else {
             row = []
           }
         }
-      } else if (c !== QUOTE) {
+      } else if (c === QUOTE && buf.length === 0) {
+        // start of quote
+        quoting = true
+      } else {
+        buf = buf + c
+      }
+    } else {
+      if (c !== QUOTE) {
         buf = buf + c
       } else {
         if (i < s.length && s.charAt(i) === QUOTE) {
@@ -56,40 +62,12 @@ const getState = (i, s) => {
           quoting = false
         }
       }
-    } else {
-      if (c === valueDelim) {
-        buf = buf.trim()
-        row.push(buf)
-        valid = valid || buf.length > 0
-        buf = ""
-      } else if (c === recordDelim) {
-        if (buf.length > 0) {
-          buf = buf.trim()
-          row.push(buf)
-          valid = valid || buf.length > 0
-          buf = ""
-        }
-
-        if (valid) {
-          break
-        } else {
-          row = []
-        }
-      } else if (c === QUOTE && buf.length === 0) {
-        // start of quote
-        quoting = true
-      } else {
-        buf = buf + c
-      }
     }
   }
 
   if (buf.length > 0) {
-    if (quoting) buf = QUOTE + buf
-    buf = buf.trim()
     row.push(buf)
-    valid = valid || c.length > 0
-    buf = ""
+    valid = valid || buf.trim().length > 0
   }
 
   return {
