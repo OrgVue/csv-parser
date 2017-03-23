@@ -1,13 +1,15 @@
 "use strict"
 
 // Imports.
-const parser = require("./src/parser.js")
+const createTransform = require("./src/createTransform.js")
+const parseString = require("./src/parseString.js")
 const extenders = require("./src/extenders.js")
 const Stream = require("./src/Stream.js")
 
 // Exports.
 module.exports = {
   createObject: extenders.createObject,
-  parseString: parser.parseString,
+  parseString: parseString,
+  createTransform: createTransform,
   Stream: Stream
 }

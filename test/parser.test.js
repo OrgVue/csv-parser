@@ -2,12 +2,18 @@
 
 const assert = require("assert")
 const parser = require("../src/parser.js")
-const Stream = require("../src/Stream.js")
 
-const parse = s => Stream.toArray(parser.parseString(s))
+// parse :: String -> [[String]]
+const parse = s => {
+  var r
+
+  r = parser.data(s, parser.create(10))
+
+  return r[0].concat(parser.end(r[1]))
+}
 
 describe("parser", function() {
-  describe("#parseString", function() {
+  describe("#data", function() {
     it("should handle a single unmatched quote", function() {
       assert.deepStrictEqual(parse('"hello world,3.14\n'), [['hello world,3.14\n']])
 
@@ -30,5 +36,9 @@ describe("parser", function() {
     it("should ignore empty rows", function() {
       assert.deepStrictEqual(parse('a,b\n , \nc,d\n , \n'), [['a', 'b'], ['c', 'd']])
     })
+  })
+
+  describe("#end", function() {
+    
   })
 })

@@ -2,9 +2,6 @@
 
 "use strict"
 
-// Imports.
-const Stream = require("./Stream.js")
-
 // QUOTE :: String
 const QUOTE = '"'
 
@@ -14,26 +11,40 @@ const recordDelim = "\n"
 // valueDelim :: String
 const valueDelim = ","
 
-// parseString :: String -> Stream [String]
-const parseString = s => Stream(
-  stateForString(0, s),
-  state => state.row,
-  state => stateForString(state.i, state.s)
-)
-
-// data StringState = StringState {
+// data Parser = Parser {
+//   buf :: String,
 //   i :: Number,
-//   row :: [String] | Stream.EOS
+//   n :: Number,
+//   quoting :: Bool
+//   row :: [String]
+//   rows :: [[String]] - note this is mutated
 //   s :: String
+//   valid :: Bool
 //  }
 
-// stateForString :: Number -> String -> StringState
-const stateForString = (i, s) => {
-  var buf, c, quoting, row, valid
+// create :: Number -> Parser
+const create = n => ({
+  buf: "",
+  i: 0,
+  n: n,
+  quoting: false,
+  row: [],
+  rows: [],
+  s: "",
+  valid: false
+})
 
-  buf = ""
-  quoting = valid = false
-  row = []
+// data :: String -> Parser -> ([[String]], Parser)
+const data = (chunk, p) => {
+  var buf, c, i, quoting, row, s, valid
+
+  buf = p.buf
+  i = p.i
+  quoting = p.quoting
+  row = p.row
+  s = p.s + chunk
+  valid = p.valid
+
   while (i < s.length) {
     c = s.charAt(i++)
 
@@ -45,7 +56,10 @@ const stateForString = (i, s) => {
 
         if (c === recordDelim) { // end of record
           if (valid) {
-            break
+            p.rows.push(row)
+            row = []
+            valid = false
+            if (p.rows.length >= p.n) break
           } else {
             row = []
           }
@@ -72,19 +86,38 @@ const stateForString = (i, s) => {
     }
   }
 
-  if (buf.length > 0) {
-    row.push(buf)
-    valid = valid || buf.trim().length > 0
+  return [p.rows.length >= p.n ? p.rows : [], {
+    buf: buf,
+    i: i,
+    n: p.n,
+    quoting: quoting,
+    row: row,
+    rows: p.rows.length >= p.n ? [] : p.rows,
+    s: s,
+    valid: valid
+  }]
+}
+
+// end :: Parser -> [[String]]
+const end = p => {
+  var valid
+
+  valid = p.valid
+  if (p.buf.length > 0) {
+    p.row.push(p.buf)
+    valid = valid || p.buf.trim().length > 0
   }
 
-  return {
-    i: i,
-    row: valid ? row : Stream.EOS,
-    s: s
+  if (valid) {
+    p.rows.push(p.row)
   }
+
+  return p.rows
 }
 
 // Exports.
 module.exports = {
-  parseString: parseString
+  create: create,
+  data: data,
+  end: end
 }
