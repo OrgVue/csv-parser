@@ -14,14 +14,21 @@ const recordDelim = "\n"
 // valueDelim :: String
 const valueDelim = ","
 
-// data State = State {
+// parseString :: String -> Stream [String]
+const parseString = s => Stream(
+  stateForString(0, s),
+  state => state.row,
+  state => stateForString(state.i, state.s)
+)
+
+// data StringState = StringState {
 //   i :: Number,
 //   row :: [String] | Stream.EOS
 //   s :: String
 //  }
 
-// getState :: Number -> String -> State
-const getState = (i, s) => {
+// stateForString :: Number -> String -> StringState
+const stateForString = (i, s) => {
   var buf, c, quoting, row, valid
 
   buf = ""
@@ -76,13 +83,6 @@ const getState = (i, s) => {
     s: s
   }
 }
-
-// parseString :: String -> Stream [String]
-const parseString = s => Stream(
-  getState(0, s),
-  state => state.row,
-  state => getState(state.i, state.s)
-)
 
 // Exports.
 module.exports = {
