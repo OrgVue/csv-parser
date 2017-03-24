@@ -2,6 +2,9 @@
 
 "use strict"
 
+// Imports.
+const mixin = require("./mixin.js")
+
 // QUOTE :: String
 const QUOTE = '"'
 
@@ -100,7 +103,9 @@ const data = (chunk, p) => {
 
 // end :: Parser -> [[String]]
 const end = p => {
-  var valid
+  var r, valid
+
+  p = data("", mixin({ n: Number.MAX_VALUE })(p))[1] // force read all, but return nothing
 
   valid = p.valid
   if (p.buf.length > 0) {
