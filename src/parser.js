@@ -91,12 +91,12 @@ const data = (chunk, p) => {
 
   return [p.rows.length >= p.n ? p.rows : [], {
     buf: buf,
-    i: i,
+    i: i > s.length / 2 ? 0 : i,
     n: p.n,
     quoting: quoting,
     row: row,
     rows: p.rows.length >= p.n ? [] : p.rows,
-    s: s,
+    s: i > s.length / 2 ? s.substr(i) : s,
     valid: valid
   }]
 }
