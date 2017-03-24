@@ -50,6 +50,23 @@ while ((obj = Stream.extract(stream)) !== Stream.EOS) {
 // { one: "Hello world", two: 3.14 }
 ```
 
+## Using node streams
+
+```javascript
+"use strict"
+
+const fs = require("fs")
+const parser = require("csv-parser")
+
+const file = fs.createReadStream("./Big.csv", "utf-8")
+const read = file.pipe(parser.parseStream(25000)).pipe(parser.objectTransform())
+read.on("data", data => {
+  // data contains an array of objects
+})
+read.on("end", () => console.log("END"))
+read.read()
+```
+
 ## Todo
 - Support file streams
 - Check excel behaviour, allow setting value delimiter to tab to allow reading pastes
