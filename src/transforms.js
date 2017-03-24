@@ -38,7 +38,7 @@ const objectTransform = () => {
 const parseStream = n => {
   var p
 
-  p = parser.create(n)
+  p = parser.create(n + 1, n)
 
   return new stream.Transform({
     flush: function(callback) {

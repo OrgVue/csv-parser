@@ -7,7 +7,7 @@ const parser = require("../src/parser.js")
 const parse = s => {
   var r
 
-  r = parser.data(s, parser.create(10))
+  r = parser.data(s, parser.create(10, 10))
 
   return r[0].concat(parser.end(r[1]))
 }
@@ -17,7 +17,7 @@ describe("parser", function() {
     it("should return batches", function() {
       var p, r
 
-      p = parser.create(3)
+      p = parser.create(3, 3)
       r = parser.data('1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n', p)
       assert.deepStrictEqual(r[0], [['1'], ['2'], ['3']])
 
@@ -57,7 +57,7 @@ describe("parser", function() {
     it("should handle chunk crossing values", function() {
       var p, r
 
-      p = parser.create(1)
+      p = parser.create(1, 1)
       r = parser.data('hello world, foo', p)
       assert.deepStrictEqual(r[0], [])
 
@@ -70,7 +70,7 @@ describe("parser", function() {
     it("should handle chunk crossing records", function() {
       var p, r
 
-      p = parser.create(1)
+      p = parser.create(1, 1)
       r = parser.data('hello,world', p)
       assert.deepStrictEqual(r[0], [])
 

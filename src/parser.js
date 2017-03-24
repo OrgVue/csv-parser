@@ -25,11 +25,12 @@ const valueDelim = ","
 //   valid :: Bool
 //  }
 
-// create :: Number -> Parser
-const create = n => ({
+// create :: Number -> Number -> Parser
+const create = (n1, nrest) => ({
   buf: "",
   i: 0,
-  n: n,
+  n: n1,
+  nrest: nrest,
   quoting: false,
   row: [],
   rows: [],
@@ -39,7 +40,7 @@ const create = n => ({
 
 // data :: String -> Parser -> ([[String]], Parser)
 const data = (chunk, p) => {
-  var buf, c, i, quoting, row, s, valid
+  var buf, c, i, quoting, result, row, s, valid
 
   buf = p.buf
   i = p.i
@@ -89,13 +90,16 @@ const data = (chunk, p) => {
     }
   }
 
-  return [p.rows.length >= p.n ? p.rows : [], {
+  result = p.rows.length >= p.n
+
+  return [result ? p.rows : [], {
     buf: buf,
     i: i > s.length / 2 ? 0 : i,
-    n: p.n,
+    n: result ? p.nrest : p.n,
+    nrest: p.nrest,
     quoting: quoting,
     row: row,
-    rows: p.rows.length >= p.n ? [] : p.rows,
+    rows: result ? [] : p.rows,
     s: i > s.length / 2 ? s.substr(i) : s,
     valid: valid
   }]

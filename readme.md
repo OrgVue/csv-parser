@@ -68,5 +68,4 @@ read.read()
 ```
 
 ## Todo
-- Support file streams
 - Check excel behaviour, allow setting value delimiter to tab to allow reading pastes
