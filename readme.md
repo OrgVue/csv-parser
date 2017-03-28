@@ -59,7 +59,7 @@ const fs = require("fs")
 const parser = require("csv-parser")
 
 const file = fs.createReadStream("./Big.csv", "utf-8")
-const read = file.pipe(parser.parseStream(25000)).pipe(parser.objectTransform())
+const read = file.pipe(parser.parseStream(25000)).pipe(parser.objectTransform({ trimHeader: true }))
 read.on("data", data => {
   // data contains an array of objects
 })

@@ -7,8 +7,8 @@ const objectifier = require("./objectifier.js")
 const parser = require("./parser.js")
 const stream = require("stream")
 
-// objectTransform :: () -> Transform
-const objectTransform = () => {
+// objectTransform :: Options -> Transform
+const objectTransform = options => {
   var keys
 
   return new stream.Transform({
@@ -21,6 +21,7 @@ const objectTransform = () => {
 
       if (!keys && chunk.length > 0) {
         keys = chunk[0]
+        if (options && options.trimHeader) keys = keys.map(key => key.trim())
         rows = chunk.slice(1)
       } else {
         rows = chunk
