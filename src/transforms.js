@@ -7,9 +7,36 @@ const objectifier = require("./objectifier.js")
 const parser = require("./parser.js")
 const stream = require("stream")
 
-// objectTransform :: Options -> Transform
+// batch :: Number -> Transform Object [Object]
+const batch = n => {
+  var buf
+
+  buf = []
+  return new stream.Transform({
+    flush: function(callback) {
+      if (buf.length > 0) {
+        this.push(buf)
+        buf = []
+      }
+
+      callback()
+    },
+    objectMode: true,
+    transform: function(chunk, encoding, callback) {
+      buf.push(chunk)
+      if (buf.length >= n) {
+        this.push(buf)
+        buf = []
+      }
+
+      callback()
+    }
+  })
+}
+
+// objectTransform :: Options -> Transform [String] Object
 const objectTransform = options => {
-  var keys
+  var f, keys
 
   return new stream.Transform({
     flush: function(callback) {
@@ -17,36 +44,32 @@ const objectTransform = options => {
     },
     objectMode: true,
     transform: function(chunk, encoding, callback) {
-      var objects, rows
-
-      if (!keys && chunk.length > 0) {
-        keys = chunk[0]
+      if (!keys) {
+        keys = chunk
         if (options && options.trimHeader) keys = keys.map(key => key.trim())
-        rows = chunk.slice(1)
+        f = objectifier.readObject(keys)
       } else {
-        rows = chunk
+        this.push(f(chunk))
       }
-
-      objects = rows.map(objectifier.readObject(keys))
-      if (objects.length > 0) this.push(objects)
 
       callback()
     }
   })
 }
 
-// parseStream :: Number -> Transform
-const parseStream = n => {
+// parseStream :: () -> Transform String [String]
+const parseStream = () => {
   var p
 
-  p = parser.create(n + 1, n)
+  p = parser.create()
 
   return new stream.Transform({
     flush: function(callback) {
-      var r
+      var i, r
 
       r = parser.end(p)
-      if (r.length > 0) this.push(r)
+      for (i = 0; i < r.length; i++) this.push(r[i])
+
       p = undefined
       callback()
     },
@@ -55,7 +78,7 @@ const parseStream = n => {
       var r
 
       r = parser.data(String(chunk), p)
-      while (r[0].length > 0) {
+      while (r[0] !== undefined) {
         this.push(r[0])
         r = parser.data("", r[1])
       }
@@ -68,6 +91,7 @@ const parseStream = n => {
 
 // Exports.
 module.exports = {
+  batch: batch,
   objectTransform: objectTransform,
   parseStream: parseStream
 }

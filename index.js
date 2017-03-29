@@ -8,6 +8,7 @@ const transforms = require("./src/transforms.js")
 
 // Exports.
 module.exports = {
+  batch: transforms.batch,
   createObject: extenders.createObject,
   objectTransform: transforms.objectTransform,
   parseStream: transforms.parseStream,

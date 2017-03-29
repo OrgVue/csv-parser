@@ -4,21 +4,21 @@
 const parser = require("./parser.js")
 const Stream = require("./Stream.js")
 
-// data :: String -> Parser -> ([[String]], Parser)
+// data :: String -> Parser -> ([String], Parser)
 const data = (chunk, p) => {
   var r
 
-  if (!p) return [[], undefined]
+  if (!p) return [undefined, undefined]
 
   r = parser.data(chunk, p)
 
-  return r[0].length > 0 ? r : [parser.end(r[1]), undefined]
+  return r[0] !== undefined ? r : [parser.end(r[1])[0], undefined]
 }
 
 // parseString :: String -> Stream [String]
 const parseString = s => Stream(
-  data(s, parser.create(1, 1)),
-  state => state[0].length > 0 ? state[0][0] : Stream.EOS,
+  data(s, parser.create()),
+  state => state[0] !== undefined ? state[0] : Stream.EOS,
   state => data("", state[1])
 )
 

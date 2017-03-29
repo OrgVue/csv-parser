@@ -58,8 +58,11 @@ while ((obj = Stream.extract(stream)) !== Stream.EOS) {
 const fs = require("fs")
 const parser = require("csv-parser")
 
-const file = fs.createReadStream("./Big.csv", "utf-8")
-const read = file.pipe(parser.parseStream(25000)).pipe(parser.objectTransform({ trimHeader: true }))
+const read = fs.createReadStream("./Big.csv", "utf-8").
+  pipe(parser.parseStream()).
+  pipe(parser.objectTransform({ trimHeader: true })).
+  pipe(parser.batch(25000))
+  
 read.on("data", data => {
   // data contains an array of objects
 })

@@ -5,26 +5,30 @@ const parser = require("../src/parser.js")
 
 // parse :: String -> [[String]]
 const parse = s => {
-  var r
+  var r, rows
 
-  r = parser.data(s, parser.create(10, 10))
+  r = parser.data(s, parser.create())
+  rows = r[0] !== undefined ? [r[0]] : []
 
-  return r[0].concat(parser.end(r[1]))
+  return rows.concat(parser.end(r[1]))
 }
 
 describe("parser", function() {
   describe("#create", function() {
-    it("should return batches", function() {
+    it("should return one by one", function() {
       var p, r
 
-      p = parser.create(3, 3)
-      r = parser.data('1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n', p)
-      assert.deepStrictEqual(r[0], [['1'], ['2'], ['3']])
+      p = parser.create()
+      r = parser.data('1\n2\n3', p)
+      assert.deepStrictEqual(r[0], ['1'])
 
       r = parser.data("", r[1])
-      assert.deepStrictEqual(r[0], [['4'], ['5'], ['6']])
+      assert.deepStrictEqual(r[0], ['2'])
 
-      assert.deepStrictEqual(parser.end(r[1]), [['7'], ['8'], ['9'], ['10']])
+      r = parser.data("", r[1])
+      assert.deepStrictEqual(r[0], undefined)
+
+      assert.deepStrictEqual(parser.end(r[1]), [['3']])
     })
   })
 
@@ -57,12 +61,12 @@ describe("parser", function() {
     it("should handle chunk crossing values", function() {
       var p, r
 
-      p = parser.create(1, 1)
+      p = parser.create()
       r = parser.data('hello world, foo', p)
-      assert.deepStrictEqual(r[0], [])
+      assert.strictEqual(r[0], undefined)
 
       r = parser.data('bar\none,two\n', r[1])
-      assert.deepStrictEqual(r[0], [['hello world', ' foobar']])
+      assert.deepStrictEqual(r[0], ['hello world', ' foobar'])
 
       assert.deepStrictEqual(parser.end(r[1]), [['one', 'two']])
     })
@@ -70,12 +74,12 @@ describe("parser", function() {
     it("should handle chunk crossing records", function() {
       var p, r
 
-      p = parser.create(1, 1)
+      p = parser.create()
       r = parser.data('hello,world', p)
-      assert.deepStrictEqual(r[0], [])
+      assert.deepStrictEqual(r[0], undefined)
 
       r = parser.data('\none', r[1])
-      assert.deepStrictEqual(r[0], [['hello', 'world']])
+      assert.deepStrictEqual(r[0], ['hello', 'world'])
 
       assert.deepStrictEqual(parser.end(r[1]), [['one']])
     })

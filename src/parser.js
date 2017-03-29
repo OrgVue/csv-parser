@@ -2,9 +2,6 @@
 
 "use strict"
 
-// Imports.
-const mixin = require("./mixin.js")
-
 // QUOTE :: String
 const QUOTE = '"'
 
@@ -17,28 +14,23 @@ const valueDelim = ","
 // data Parser = Parser {
 //   buf :: String,
 //   i :: Number,
-//   n :: Number,
 //   quoting :: Bool
 //   row :: [String]
-//   rows :: [[String]] - note this is mutated
 //   s :: String
 //   valid :: Bool
 //  }
 
-// create :: Number -> Number -> Parser
-const create = (n1, nrest) => ({
+// create :: () -> Parser
+const create = () => ({
   buf: "",
   i: 0,
-  n: n1,
-  nrest: nrest,
   quoting: false,
   row: [],
-  rows: [],
   s: "",
   valid: false
 })
 
-// data :: String -> Parser -> ([[String]], Parser)
+// data :: String -> Parser -> ([String], Parser)
 const data = (chunk, p) => {
   var buf, c, i, quoting, result, row, s, valid
 
@@ -49,7 +41,7 @@ const data = (chunk, p) => {
   s = p.s + chunk
   valid = p.valid
 
-  while (i < s.length) {
+  while (!result && i < s.length) {
     c = s.charAt(i++)
 
     if (!quoting) {
@@ -60,10 +52,9 @@ const data = (chunk, p) => {
 
         if (c === recordDelim) { // end of record
           if (valid) {
-            p.rows.push(row)
+            result = row
             row = []
             valid = false
-            if (p.rows.length >= p.n) break
           } else {
             row = []
           }
@@ -90,16 +81,11 @@ const data = (chunk, p) => {
     }
   }
 
-  result = p.rows.length >= p.n
-
-  return [result ? p.rows : [], {
+  return [result, {
     buf: buf,
     i: i > s.length / 2 ? 0 : i,
-    n: result ? p.nrest : p.n,
-    nrest: p.nrest,
     quoting: quoting,
     row: row,
-    rows: result ? [] : p.rows,
     s: i > s.length / 2 ? s.substr(i) : s,
     valid: valid
   }]
@@ -107,10 +93,17 @@ const data = (chunk, p) => {
 
 // end :: Parser -> [[String]]
 const end = p => {
-  var r, valid
+  var r, rows, valid
 
-  p = data("", mixin({ n: Number.MAX_VALUE })(p))[1] // force read all, but return nothing
+  rows = []
+  r = data("", p)
 
+  while (r[0] !== undefined) {
+    rows.push(r[0])
+    r = data("", r[1])
+  }
+
+  p = r[1]
   valid = p.valid
   if (p.buf.length > 0) {
     p.row.push(p.buf)
@@ -118,10 +111,10 @@ const end = p => {
   }
 
   if (valid) {
-    p.rows.push(p.row)
+    rows.push(p.row)
   }
 
-  return p.rows
+  return rows
 }
 
 // Exports.
