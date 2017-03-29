@@ -2,7 +2,27 @@
 
 A pure, streaming parser for the CSV format.
 
-## Basic usage
+## Using node streams
+
+```javascript
+"use strict"
+
+const fs = require("fs")
+const parser = require("csv-parser")
+
+const read = fs.createReadStream("./Big.csv", "utf-8").
+  pipe(parser.parseStream()).
+  pipe(parser.objectTransform({ trimHeader: true })).
+  pipe(parser.batch(25000))
+  
+read.on("data", data => {
+  // data contains an array of 25000 objects, or fewer for the very last chunk
+})
+read.on("end", () => console.log("END"))
+read.read()
+```
+
+## Using pure streams from in memory string
 
 The parser will return a stream of arrays. Each array represents a line in the CSV and each string in the array represents a value.
 
@@ -24,7 +44,7 @@ while ((row = Stream.extract(stream)) !== Stream.EOS) {
 // ["Hello world", "3.14"]
 ```
 
-## Extending the stream to objects
+## Extending the pure stream to objects
 
 With an extender we can return a stream of object, where the values are read as booleans, numbers or strings.
 
@@ -48,26 +68,6 @@ while ((obj = Stream.extract(stream)) !== Stream.EOS) {
 
 // The following will be logged to the console
 // { one: "Hello world", two: 3.14 }
-```
-
-## Using node streams
-
-```javascript
-"use strict"
-
-const fs = require("fs")
-const parser = require("csv-parser")
-
-const read = fs.createReadStream("./Big.csv", "utf-8").
-  pipe(parser.parseStream()).
-  pipe(parser.objectTransform({ trimHeader: true })).
-  pipe(parser.batch(25000))
-  
-read.on("data", data => {
-  // data contains an array of objects
-})
-read.on("end", () => console.log("END"))
-read.read()
 ```
 
 ## Todo
