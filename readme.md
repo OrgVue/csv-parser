@@ -70,5 +70,37 @@ while ((obj = Stream.extract(stream)) !== Stream.EOS) {
 // { one: "Hello world", two: 3.14 }
 ```
 
+## API
+### batch
+```javascript
+// batch :: Number -> Transform a [a]
+```
+Batch transforms a stream of items into a stream of batches, with the batch size given as a number of items.
+
+### filter
+```javascript
+// filter :: (a -> Bool) -> Transforms a a
+```
+Given a predicate, filter a stream of items.
+
+### map
+```javascript
+// map :: (a -> b) -> Transforms a b
+```
+Given a mapping function, transform a stream of a's to a stream of b's.
+
+### objectTransform
+```javascript
+// objectTransform :: Options -> Transform [String] Object
+```
+Transform a stream of values to a stream of objects, either by specifying a header or using the first value as the header.
+
+### parseStream
+```javascript
+// parseStream :: () -> Transform String [String]
+```
+Parse a character stream as CSV, resulting in a stream of values.
+
+
 ## Todo
 - Check excel behaviour, allow setting value delimiter to tab to allow reading pastes
