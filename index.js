@@ -11,6 +11,7 @@ module.exports = {
   batch: transforms.batch,
   createObject: extenders.createObject,
   filter: transforms.filter,
+  map: transforms.map,
   objectTransform: transforms.objectTransform,
   parseStream: transforms.parseStream,
   parseString: parseString,

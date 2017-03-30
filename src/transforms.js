@@ -7,7 +7,7 @@ const objectifier = require("./objectifier.js")
 const parser = require("./parser.js")
 const stream = require("stream")
 
-// batch :: Number -> Transform Object [Object]
+// batch :: Number -> Transform a [a]
 const batch = n => {
   var buf
 
@@ -34,21 +34,36 @@ const batch = n => {
   })
 }
 
-// filter :: Function -> Transform Object [Object]
+// filter :: (a -> Bool) -> Transform a a
 const filter = f => {
   return new stream.Transform({
+    flush: function(callback) {
+      callback()
+    },
     objectMode: true,
     transform: function(chunk, encoding, callback) {
       if (f(chunk)) {
-        this.push(chunk);
+        this.push(chunk)
       }
 
-      callback();
-    },
-    flush: function(callback) {
-      callback();
+      callback()
     }
-  });
+  })
+}
+
+// map :: (a -> b) -> Transform a b
+const map = m => {
+  return new stream.Transform({
+    flush: function(callback) {
+      callback()
+    },
+    objectMode: true,
+    transform: function(chunk, encoding, callback) {
+      this.push(m(chunk))
+
+      callback()
+    }
+  })
 }
 
 // objectTransform :: Options -> Transform [String] Object
@@ -110,6 +125,7 @@ const parseStream = () => {
 module.exports = {
   batch: batch,
   filter: filter,
+  map: map,
   objectTransform: objectTransform,
   parseStream: parseStream
 }
