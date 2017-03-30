@@ -34,6 +34,23 @@ const batch = n => {
   })
 }
 
+// filter :: Function -> Transform Object [Object]
+const filter = f => {
+  return new stream.Transform({
+    objectMode: true,
+    transform: function(chunk, encoding, callback) {
+      if (f(chunk)) {
+        this.push(chunk);
+      }
+
+      callback();
+    },
+    flush: function(callback) {
+      callback();
+    }
+  });
+}
+
 // objectTransform :: Options -> Transform [String] Object
 const objectTransform = options => {
   var f, keys
