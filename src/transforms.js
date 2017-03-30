@@ -109,6 +109,7 @@ const parseStream = () => {
 // Exports.
 module.exports = {
   batch: batch,
+  filter: filter,
   objectTransform: objectTransform,
   parseStream: parseStream
 }
