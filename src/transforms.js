@@ -89,11 +89,11 @@ const objectTransform = options => {
   })
 }
 
-// parseStream :: () -> Transform String [String]
-const parseStream = () => {
+// parseStream :: Options -> Transform String [String]
+const parseStream = o => {
   var p
 
-  p = parser.create()
+  p = parser.create(o)
 
   return new stream.Transform({
     flush: function(callback) {

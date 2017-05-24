@@ -18,16 +18,18 @@ const valueDelim = ","
 //   row :: [String]
 //   s :: String
 //   valid :: Bool
+//   valueDelim :: String
 //  }
 
-// create :: () -> Parser
-const create = () => ({
+// create :: Options -> Parser
+const create = o => ({
   buf: "",
   i: 0,
   quoting: false,
   row: [],
   s: "",
-  valid: false
+  valid: false,
+  valueDelim: o && o.valueDelim ? o.valueDelim : valueDelim
 })
 
 // data :: String -> Parser -> ([String], Parser)
@@ -45,7 +47,7 @@ const data = (chunk, p) => {
     c = s.charAt(i++)
 
     if (!quoting) {
-      if (c === valueDelim || c === recordDelim) { // end of value
+      if (c === p.valueDelim || c === recordDelim) { // end of value
         row.push(buf)
         valid = valid || buf.trim().length > 0
         buf = ""
@@ -87,7 +89,8 @@ const data = (chunk, p) => {
     quoting: quoting,
     row: row,
     s: i > s.length / 2 ? s.substr(i) : s,
-    valid: valid
+    valid: valid,
+    valueDelim: p.valueDelim
   }]
 }
 
