@@ -15,5 +15,6 @@ module.exports = {
   objectTransform: transforms.objectTransform,
   parseStream: transforms.parseStream,
   parseString: parseString,
+  skip: transforms.skip,
   Stream: Stream
 }

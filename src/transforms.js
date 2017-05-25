@@ -121,11 +121,33 @@ const parseStream = o => {
   })
 }
 
+// skip :: Number -> Transform a a
+const skip = n => {
+  var i = 0;
+
+  return new stream.Transform({
+    flush: function(callback) {
+      callback()
+    },
+    objectMode: true,
+    transform: function(chunk, encoding, callback) {
+      if (i < n) {
+        i += 1;
+      } else {
+        this.push(chunk)
+      }
+      
+      callback()
+    }
+  })
+}
+
 // Exports.
 module.exports = {
   batch: batch,
   filter: filter,
   map: map,
   objectTransform: objectTransform,
-  parseStream: parseStream
+  parseStream: parseStream,
+  skip: skip
 }
