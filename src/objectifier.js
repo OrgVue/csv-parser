@@ -9,7 +9,7 @@ const readObject = keys => values => {
   obj = {}
   for (i = 0; i < keys.length; i++) {
     value = readValue(values[i])
-    if (value !== undefined) obj[keys[i]] = value
+    obj[keys[i]] = value
   }
 
   return obj
