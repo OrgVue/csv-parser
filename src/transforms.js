@@ -79,7 +79,7 @@ const objectTransform = options => {
       if (!keys) {
         keys = chunk
         if (options && options.trimHeader) keys = keys.map(key => key.trim())
-        f = objectifier.readObject(keys)
+        f = objectifier.readObject(keys, options.reviver)
       } else {
         this.push(f(chunk))
       }
@@ -123,7 +123,7 @@ const parseStream = o => {
 
 // skip :: Number -> Transform a a
 const skip = n => {
-  var i = 0;
+  var i = 0
 
   return new stream.Transform({
     flush: function(callback) {
@@ -132,11 +132,11 @@ const skip = n => {
     objectMode: true,
     transform: function(chunk, encoding, callback) {
       if (i < n) {
-        i += 1;
+        i += 1
       } else {
         this.push(chunk)
       }
-      
+
       callback()
     }
   })

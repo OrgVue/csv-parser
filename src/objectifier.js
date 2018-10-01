@@ -2,13 +2,14 @@
 
 "use strict"
 
-// readObject :: [String] -> [String] -> Object String a
-const readObject = keys => values => {
+// readObject :: [String] -> (a -> b) -> [String] -> Object String a
+const readObject = (keys, reviver) => values => {
   var i, obj, value
 
   obj = {}
   for (i = 0; i < keys.length; i++) {
     value = readValue(values[i])
+    if (typeof reviver === "function") value = reviver(value)
     obj[keys[i]] = value
   }
 
