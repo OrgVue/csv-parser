@@ -38,13 +38,13 @@ describe("transforms", function() {
     it("should parse a stream", function(done) {
       var r, s
 
-      s = stringStream('one, two\nhello,world')
+      s = stringStream("one, two\nhello,world")
       s = s.pipe(transforms.parseStream())
 
       r = []
       s.on("data", row => r.push(row))
       s.on("end", () => {
-        assert.deepStrictEqual(r, [['one', ' two'], ['hello', 'world']])
+        assert.deepStrictEqual(r, [["one", " two"], ["hello", "world"]])
         done()
       })
       s.read()
@@ -58,9 +58,9 @@ describe("transforms", function() {
       s = new stream.Readable({
         objectMode: true,
         read: function(size) {
-          this.push(['one', ' two'])
-          this.push(['hello', ' true  '])
-          this.push(['3.14'])
+          this.push(["one", " two"])
+          this.push(["hello", " true  "])
+          this.push(["3.14"])
           this.push(null)
         }
       }).pipe(transforms.objectTransform({ trimHeader: true }))
@@ -70,7 +70,7 @@ describe("transforms", function() {
       s.on("end", () => {
         assert.deepStrictEqual(r, [
           { one: "hello", two: true },
-          { one: 3.14 }
+          { one: 3.14, two: undefined }
         ])
         done()
       })

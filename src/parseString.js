@@ -15,12 +15,13 @@ const data = (chunk, p) => {
   return r[0] !== undefined ? r : [parser.end(r[1])[0], undefined]
 }
 
-// parseString :: String -> Stream [String]
-const parseString = s => Stream(
-  data(s, parser.create()),
-  state => state[0] !== undefined ? state[0] : Stream.EOS,
-  state => data("", state[1])
-)
+// parseString :: String -> Options -> Stream [String]
+const parseString = (s, o) =>
+  Stream(
+    data(s, parser.create(o)),
+    state => (state[0] !== undefined ? state[0] : Stream.EOS),
+    state => data("", state[1])
+  )
 
 // Exports.
 module.exports = parseString
