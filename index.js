@@ -5,6 +5,7 @@ const extenders = require("./src/extenders.js")
 const parseString = require("./src/parseString.js")
 const parseSync = require("./src/parseSync.js")
 const Stream = require("./src/Stream.js")
+const toArray = require("./src/toArray.js")
 const transforms = require("./src/transforms.js")
 
 // Exports.
@@ -18,5 +19,6 @@ module.exports = {
   parseString: parseString,
   parseSync: parseSync,
   skip: transforms.skip,
-  Stream: Stream
+  Stream: Stream,
+  toArray: toArray
 }
