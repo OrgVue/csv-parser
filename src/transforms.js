@@ -79,7 +79,7 @@ const objectTransform = options => {
       if (!keys) {
         keys = chunk
         if (options && options.trimHeader) keys = keys.map(key => key.trim())
-        f = objectifier.readObject(keys, options.reviver)
+        f = objectifier.readObject(keys, options ? options.reviver : null)
       } else {
         this.push(f(chunk))
       }
