@@ -13,7 +13,10 @@ const parseSync = (s, o = {}) => {
     x,
     xs = []
 
-  let stream = parseString(s, { valueDelim: o.valueDelim })
+  let stream = parseString(s, {
+    recordDelim: o.recordDelim,
+    valueDelim: o.valueDelim
+  })
 
   while ((x = Stream.extract(stream)) !== Stream.EOS) {
     if (!reader) {

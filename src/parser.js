@@ -26,6 +26,7 @@ const create = o => ({
   buf: "",
   i: 0,
   quoting: false,
+  recordDelim: o && o.recordDelim ? o.recordDelim : recordDelim,
   row: [],
   s: "",
   valid: false,
@@ -47,12 +48,14 @@ const data = (chunk, p) => {
     c = s.charAt(i++)
 
     if (!quoting) {
-      if (c === p.valueDelim || c === recordDelim) { // end of value
+      if (c === p.valueDelim || c === p.recordDelim) {
+        // end of value
         row.push(buf)
         valid = valid || buf.trim().length > 0
         buf = ""
 
-        if (c === recordDelim) { // end of record
+        if (c === p.recordDelim) {
+          // end of record
           if (valid) {
             result = row
             row = []
@@ -83,15 +86,18 @@ const data = (chunk, p) => {
     }
   }
 
-  return [result, {
-    buf: buf,
-    i: i > s.length / 2 ? 0 : i,
-    quoting: quoting,
-    row: row,
-    s: i > s.length / 2 ? s.substr(i) : s,
-    valid: valid,
-    valueDelim: p.valueDelim
-  }]
+  return [
+    result,
+    {
+      buf: buf,
+      i: i > s.length / 2 ? 0 : i,
+      quoting: quoting,
+      row: row,
+      s: i > s.length / 2 ? s.substr(i) : s,
+      valid: valid,
+      valueDelim: p.valueDelim
+    }
+  ]
 }
 
 // end :: Parser -> [[String]]
