@@ -92,6 +92,7 @@ const data = (chunk, p) => {
       buf: buf,
       i: i > s.length / 2 ? 0 : i,
       quoting: quoting,
+      recordDelim: p.recordDelim,
       row: row,
       s: i > s.length / 2 ? s.substr(i) : s,
       valid: valid,
