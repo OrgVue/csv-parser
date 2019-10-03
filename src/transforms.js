@@ -116,7 +116,7 @@ const parseStream = o => {
       }
 
       p = r[1]
-      callback()
+      callback(p.err) // undefined or parser Error
     }
   })
 }

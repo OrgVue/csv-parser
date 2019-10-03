@@ -14,6 +14,7 @@ const parseSync = (s, o = {}) => {
     xs = []
 
   let stream = parseString(s, {
+    multiline: o.multiline,
     recordDelim: o.recordDelim,
     valueDelim: o.valueDelim
   })

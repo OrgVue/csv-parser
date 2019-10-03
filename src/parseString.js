@@ -12,6 +12,8 @@ const data = (chunk, p) => {
 
   r = parser.data(chunk, p)
 
+  if (r[1].err) throw r[1].err // parsing Error
+
   return r[0] !== undefined ? r : [parser.end(r[1])[0], undefined]
 }
 

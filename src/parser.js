@@ -14,10 +14,12 @@ const valueDelim = ","
 // data Parser = Parser {
 //   buf :: String,
 //   i :: Number,
-//   quoting :: Bool
-//   row :: [String]
-//   s :: String
-//   valid :: Bool
+//   multiline :: Bool,
+//   quoting :: Bool,
+//   recordDelim :: String,
+//   row :: [String],
+//   s :: String,
+//   valid :: Bool,
 //   valueDelim :: String
 //  }
 
@@ -25,6 +27,7 @@ const valueDelim = ","
 const create = o => ({
   buf: "",
   i: 0,
+  multiline: o && (o.multiline === false) ? false : true,
   quoting: false,
   recordDelim: o && o.recordDelim ? o.recordDelim : recordDelim,
   row: [],
@@ -35,7 +38,7 @@ const create = o => ({
 
 // data :: String -> Parser -> ([String], Parser)
 const data = (chunk, p) => {
-  var buf, c, i, quoting, result, row, s, valid
+  var buf, c, err, i, quoting, result, row, s, valid
 
   buf = p.buf
   i = p.i
@@ -71,7 +74,12 @@ const data = (chunk, p) => {
         buf = buf + c
       }
     } else {
-      if (c !== QUOTE) {
+      if (c === p.recordDelim && !p.multiline) {
+        result = undefined
+        err = new Error('Multiline values not allowed')
+        break
+      }
+      else if (c !== QUOTE) {
         buf = buf + c
       } else {
         if (i < s.length && s.charAt(i) === QUOTE) {
@@ -90,7 +98,9 @@ const data = (chunk, p) => {
     result,
     {
       buf: buf,
+      err: err,
       i: i > s.length / 2 ? 0 : i,
+      multiline: p.multiline,
       quoting: quoting,
       recordDelim: p.recordDelim,
       row: row,
