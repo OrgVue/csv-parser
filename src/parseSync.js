@@ -22,13 +22,16 @@ const parseSync = (s, o = {}) => {
   while ((x = Stream.extract(stream)) !== Stream.EOS) {
     if (!reader) {
       if (o.trimHeader) {
-        x = x.map(key => key.trim())
+        x = x.map((key) => key.trim())
       }
       if (o.array === true) {
-        reader = a => a
+        reader = (a) => a
         xs.push(x)
       } else {
-        reader = readObject(x, o.reviver)
+        reader = readObject(x, {
+          omitUndefined: o.omitUndefined,
+          reviver: o.reviver
+        })
       }
     } else xs.push(reader(x))
     stream = Stream.next(stream)

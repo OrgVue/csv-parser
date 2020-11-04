@@ -2,22 +2,23 @@
 
 "use strict"
 
-// readObject :: [String] -> (a -> b) -> [String] -> Object String a
-const readObject = (keys, reviver) => values => {
+// readObject :: [String] -> Options -> [String] -> Object String a
+const readObject = (keys, options = {}) => (values) => {
+  const { omitUndefined, reviver } = options
   var i, obj, value
 
   obj = {}
   for (i = 0; i < keys.length; i++) {
     value = readValue(values[i])
     if (typeof reviver === "function") value = reviver(value)
-    obj[keys[i]] = value
+    if (value !== undefined || !omitUndefined) obj[keys[i]] = value
   }
 
   return obj
 }
 
 // readValue :: String -> a
-const readValue = s => {
+const readValue = (s) => {
   // n :: Number, t :: String
   var n, t
 
