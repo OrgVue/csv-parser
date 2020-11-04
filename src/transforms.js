@@ -8,12 +8,12 @@ const parser = require("./parser.js")
 const stream = require("stream")
 
 // batch :: Number -> Transform a [a]
-const batch = n => {
+const batch = (n) => {
   var buf
 
   buf = []
   return new stream.Transform({
-    flush: function(callback) {
+    flush: function (callback) {
       if (buf.length > 0) {
         this.push(buf)
         buf = []
@@ -22,7 +22,7 @@ const batch = n => {
       callback()
     },
     objectMode: true,
-    transform: function(chunk, encoding, callback) {
+    transform: function (chunk, encoding, callback) {
       buf.push(chunk)
       if (buf.length >= n) {
         this.push(buf)
@@ -35,13 +35,13 @@ const batch = n => {
 }
 
 // filter :: (a -> Bool) -> Transform a a
-const filter = f => {
+const filter = (f) => {
   return new stream.Transform({
-    flush: function(callback) {
+    flush: function (callback) {
       callback()
     },
     objectMode: true,
-    transform: function(chunk, encoding, callback) {
+    transform: function (chunk, encoding, callback) {
       if (f(chunk)) {
         this.push(chunk)
       }
@@ -52,13 +52,13 @@ const filter = f => {
 }
 
 // map :: (a -> b) -> Transform a b
-const map = m => {
+const map = (m) => {
   return new stream.Transform({
-    flush: function(callback) {
+    flush: function (callback) {
       callback()
     },
     objectMode: true,
-    transform: function(chunk, encoding, callback) {
+    transform: function (chunk, encoding, callback) {
       this.push(m(chunk))
 
       callback()
@@ -67,19 +67,20 @@ const map = m => {
 }
 
 // objectTransform :: Options -> Transform [String] Object
-const objectTransform = options => {
+const objectTransform = (options = {}) => {
+  const { omitUndefined, reviver, trimHeader } = options
   var f, keys
 
   return new stream.Transform({
-    flush: function(callback) {
+    flush: function (callback) {
       callback()
     },
     objectMode: true,
-    transform: function(chunk, encoding, callback) {
+    transform: function (chunk, encoding, callback) {
       if (!keys) {
         keys = chunk
-        if (options && options.trimHeader) keys = keys.map(key => key.trim())
-        f = objectifier.readObject(keys, options ? options.reviver : null)
+        if (trimHeader) keys = keys.map((key) => key.trim())
+        f = objectifier.readObject(keys, { omitUndefined, reviver })
       } else {
         this.push(f(chunk))
       }
@@ -90,13 +91,13 @@ const objectTransform = options => {
 }
 
 // parseStream :: Options -> Transform String [String]
-const parseStream = o => {
+const parseStream = (o) => {
   var p
 
   p = parser.create(o)
 
   return new stream.Transform({
-    flush: function(callback) {
+    flush: function (callback) {
       var i, r
 
       r = parser.end(p)
@@ -106,7 +107,7 @@ const parseStream = o => {
       callback()
     },
     objectMode: true,
-    transform: function(chunk, encoding, callback) {
+    transform: function (chunk, encoding, callback) {
       var r
 
       r = parser.data(String(chunk), p)
@@ -122,15 +123,15 @@ const parseStream = o => {
 }
 
 // skip :: Number -> Transform a a
-const skip = n => {
+const skip = (n) => {
   var i = 0
 
   return new stream.Transform({
-    flush: function(callback) {
+    flush: function (callback) {
       callback()
     },
     objectMode: true,
-    transform: function(chunk, encoding, callback) {
+    transform: function (chunk, encoding, callback) {
       if (i < n) {
         i += 1
       } else {
